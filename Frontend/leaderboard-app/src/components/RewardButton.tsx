@@ -4,6 +4,7 @@ impinterface RewardButtonProps {
 }
 
 const RewardButton: React.FC<RewardButtonProps> = ({ userId, onClaim }) => {rt React from 'react';
+}
 import { FaGift } from 'react-icons/fa';
 
 const RewardButton: React.FC = () => (

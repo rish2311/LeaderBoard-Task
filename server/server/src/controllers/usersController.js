@@ -4,11 +4,9 @@ const User = require('../models/User');
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find().sort({ totalPoints: -1 });
-    if (!users.length) {
-      return res.status(404).json({ error: 'No users found' });
-    }
     // Add rank and only return required fields
     const usersWithRank = users.map((user, idx) => ({
+      _id: user._id,
       name: user.name,
       avatarUrl: user.avatarUrl,
       totalPoints: user.totalPoints,
@@ -16,6 +14,7 @@ exports.getUsers = async (req, res) => {
     }));
     res.json(usersWithRank);
   } catch (err) {
+    console.error('Error fetching users:', err);
     res.status(500).json({ error: 'Server error' });
   }
 }; 
