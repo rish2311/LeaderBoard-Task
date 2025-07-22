@@ -48,7 +48,7 @@ export const useLeaderboard = () => {
     try {
       const response = await api.post<ClaimResponse>(`/claim/${userId}`);
       
-      // Refresh both leaderboard and all users
+      // Refresh both leaderboard and all users to get updated rankings
       await Promise.all([
         fetchLeaderboard(pagination.currentPage),
         fetchAllUsers()
@@ -71,7 +71,7 @@ export const useLeaderboard = () => {
     try {
       const response = await api.post<User>('/users', { name, avatar });
       
-      // Refresh both leaderboard and all users
+      // Refresh both leaderboard and all users to show new user in correct position
       await Promise.all([
         fetchLeaderboard(pagination.currentPage),
         fetchAllUsers()
@@ -93,12 +93,12 @@ export const useLeaderboard = () => {
     fetchAllUsers();
   }, [fetchLeaderboard, fetchAllUsers]);
 
-  // Auto-refresh every 30 seconds
+  // Auto-refresh every 10 seconds for real-time updates
   useEffect(() => {
     const interval = setInterval(() => {
       fetchLeaderboard(pagination.currentPage);
       fetchAllUsers();
-    }, 30000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [fetchLeaderboard, fetchAllUsers, pagination.currentPage]);

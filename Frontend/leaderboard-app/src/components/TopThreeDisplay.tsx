@@ -9,7 +9,10 @@ const TopThreeDisplay: React.FC<TopThreeDisplayProps> = ({ users }) => {
   if (users.length < 3) return null;
 
   const medals = ['🥇', '🥈', '🥉'];
-  const podiumOrder = [users[1], users[0], users[2]]; // 2nd, 1st, 3rd for podium effect
+  
+  // Ensure we have the top 3 users sorted by rank
+  const sortedTop3 = [...users].sort((a, b) => a.rank - b.rank).slice(0, 3);
+  const podiumOrder = [sortedTop3[1], sortedTop3[0], sortedTop3[2]]; // 2nd, 1st, 3rd for podium effect
 
   return (
     <div className="bg-yellow-100 p-6 rounded-lg shadow-md mb-6">
@@ -17,6 +20,8 @@ const TopThreeDisplay: React.FC<TopThreeDisplayProps> = ({ users }) => {
       
       <div className="flex justify-center items-end space-x-4">
         {podiumOrder.map((user, index) => {
+          if (!user) return null; // Handle case where we don't have 3 users yet
+          
           const actualRank = user.rank;
           const podiumHeight = actualRank === 1 ? 'h-32' : actualRank === 2 ? 'h-24' : 'h-20';
           
@@ -40,7 +45,7 @@ const TopThreeDisplay: React.FC<TopThreeDisplayProps> = ({ users }) => {
               </div>
             </div>
           );
-        })}
+        }).filter(Boolean)}
       </div>
     </div>
   );

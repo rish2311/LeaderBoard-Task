@@ -24,17 +24,19 @@ exports.claimPoints = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Create claim history entry
+      avatar: u.avatar,
     await ClaimHistory.create({
       userId,
-      pointsClaimed,
+      pointsClaimed: points,
+      timestamp: new Date()
       timestamp: new Date()
     });
 
-    res.json({
-      user,
-      pointsClaimed,
-      message: `${user.name} claimed ${pointsClaimed} points!`
+    // Get updated leaderboard with proper ranking
+    const users = await User.find().sort({ totalPoints: -1, createdAt: 1 });
+      pointsClaimed: points,
+      message: `${user.name} claimed ${points} points!`,
+      leaderboard
     });
   } catch (error) {
     console.error('Error claiming points:', error);

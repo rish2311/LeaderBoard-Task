@@ -26,8 +26,16 @@ exports.createUser = async (req, res) => {
 // GET /users - Fetch all users for dropdown
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find().sort({ totalPoints: -1 });
-    res.json(users);
+    // Get all users sorted by points and add proper ranking
+    const users = await User.find().sort({ totalPoints: -1, createdAt: 1 });
+    
+    // Add rank to each user
+    const usersWithRank = users.map((user, index) => ({
+      ...user.toObject(),
+      rank: index + 1
+    }));
+    
+    res.json(usersWithRank);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });

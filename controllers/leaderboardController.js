@@ -8,19 +8,24 @@ exports.getLeaderboard = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const totalUsers = await User.countDocuments();
-    const users = await User.find()
-      .sort({ totalPoints: -1 })
+    
+    // Get ALL users sorted by points to calculate proper ranks
+    const allUsers = await User.find().sort({ totalPoints: -1, createdAt: 1 });
+    
+    // Add rank to each user based on their position in sorted list
+    const usersWithRank = allUsers.map((user, index) => ({
+      ...user.toObject(),
+      rank: index + 1
+    }));
+    
+    // Get paginated subset
+    const paginatedUsers = usersWithRank
       .skip(skip)
       .limit(limit);
 
-    // Add rank to each user
-    const usersWithRank = users.map((user, index) => ({
-      ...user.toObject(),
-      rank: skip + index + 1
-    }));
 
     res.json({
-      users: usersWithRank,
+      users: paginatedUsers,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalUsers / limit),

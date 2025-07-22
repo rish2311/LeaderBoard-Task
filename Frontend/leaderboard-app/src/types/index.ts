@@ -2,10 +2,13 @@ export interface User {
   _id: string;
   name: string;
   totalPoints: number;
+  avatar?: string;
+  rank: number;
 }
 
 export interface ClaimResponse {
   user: User;
-  claimedPoints: number;
+  pointsClaimed: number;
+  message: string;
   leaderboard: User[];
 } 

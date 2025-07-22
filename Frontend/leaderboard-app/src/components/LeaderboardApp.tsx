@@ -30,7 +30,13 @@ const LeaderboardApp: React.FC = () => {
 
     try {
       const result = await claimPoints(selectedUser._id);
-      toast.success(result.message);
+      toast.success(`🎉 ${selectedUser.name} claimed ${result.pointsClaimed} points!`);
+      
+      // Update selected user with new data from leaderboard
+      const updatedUser = result.leaderboard?.find(u => u._id === selectedUser._id);
+      if (updatedUser) {
+        setSelectedUser(updatedUser);
+      }
     } catch (error) {
       toast.error('Failed to claim points. Please try again.');
     }
@@ -40,6 +46,9 @@ const LeaderboardApp: React.FC = () => {
     try {
       const newUser = await createUser(name, avatar);
       toast.success(`User "${newUser.name}" added successfully!`);
+      
+      // Automatically select the new user
+      setSelectedUser(newUser);
     } catch (error) {
       toast.error('Failed to add user. Please try again.');
     }
