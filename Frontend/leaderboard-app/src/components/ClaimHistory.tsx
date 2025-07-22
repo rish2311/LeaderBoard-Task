@@ -1,35 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { FaStar } from 'react-icons/fa';
+import type { ClaimHistory as ClaimHistoryType } from '../types';
 
 interface ClaimHistoryProps {
-  userId: string | null;
-}
-
-interface HistoryItem {
-  claimedPoints: number;
-  timestamp: string;
+  userId?: string;
 }
 
 const ClaimHistory: React.FC<ClaimHistoryProps> = ({ userId }) => {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [history, setHistory] = useState<ClaimHistoryType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userId) {
-      setHistory([]);
-      return;
-    }
-
     const fetchHistory = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await api.get(`/history/${userId}`);
+        const params = userId ? `?userId=${userId}` : '';
+        const response = await api.get<ClaimHistoryType[]>(`/history${params}`);
         setHistory(response.data);
       } catch (err) {
-        setError('Failed to load claim history.');
+        setError('Failed to fetch claim history');
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -39,48 +30,56 @@ const ClaimHistory: React.FC<ClaimHistoryProps> = ({ userId }) => {
     fetchHistory();
   }, [userId]);
 
-  const renderContent = () => {
-    if (!userId) {
-      return (
-        <div className="p-4 text-center">
-          <p className="text-gray-500">Select a user to see their claim history.</p>
-        </div>
-      );
-    }
-    
-    if (isLoading) {
-      return <div className="p-4 text-center">Loading history...</div>;
-    }
-    
-    if (error) {
-      return <div className="p-4 text-center text-red-500">{error}</div>;
-    }
-
-    if (history.length === 0) {
-      return <div className="p-4 text-center text-gray-500">No claims yet for this user.</div>;
-    }
-
+  if (isLoading) {
     return (
-      <ul className="space-y-3">
-        {history.map((item, index) => (
-          <li key={index} className="flex items-center text-sm">
-            <FaStar className="text-yellow-500 mr-3 flex-shrink-0" />
-            <span>
-              Claimed <strong>{item.claimedPoints}</strong> points on{' '}
-              {new Date(item.timestamp).toLocaleString()}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Claim History</h3>
+        <p className="text-center text-gray-500">Loading history...</p>
+      </div>
     );
-  };
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-bold text-gray-800 mb-4">Claim History</h3>
+        <p className="text-center text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Claim History</h2>
-      {renderContent()}
+    <div className="bg-white p-6 rounded-lg shadow-md">
+      <h3 className="text-lg font-bold text-gray-800 mb-4">
+        Recent Claims {userId ? '(Filtered)' : '(All Users)'}
+      </h3>
+      
+      {history.length === 0 ? (
+        <p className="text-center text-gray-500">No claims yet</p>
+      ) : (
+        <div className="space-y-3 max-h-64 overflow-y-auto">
+          {history.map((claim) => (
+            <div key={claim._id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="flex items-center space-x-3">
+                <img
+                  src={claim.userId.avatar || 'https://via.placeholder.com/32'}
+                  alt={claim.userId.name}
+                  className="w-8 h-8 object-cover rounded-full"
+                />
+                <div>
+                  <p className="font-medium text-gray-800">{claim.userId.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(claim.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <span className="font-bold text-green-600">+{claim.pointsClaimed}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-export default ClaimHistory; 
+export default ClaimHistory;
