@@ -1,26 +1,38 @@
 {
-  "name": "leaderboard-backend",
+  "name": "leaderboard-app",
   "version": "1.0.0",
-  "description": "Full-stack leaderboard application backend",
-  "main": "server.js",
+  "description": "Full-stack leaderboard application with React and Node.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "seed": "node seedData.js",
-    "lint": "eslint . --ext .js,.ts --fix",
-    "format": "prettier --write .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "cd server && npm start",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "cd client && npm test",
+    "test:server": "cd server && npm test",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
+    "format": "npm run format:client && npm run format:server",
+    "format:client": "cd client && npm run format",
+    "format:server": "cd server && npm run format",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "clean": "rm -rf node_modules client/node_modules server/node_modules client/dist server/dist"
   },
-  "keywords": ["leaderboard", "nodejs", "mongodb", "express"],
+  "keywords": [
+    "leaderboard",
+    "react",
+    "nodejs",
+    "mongodb",
+    "express",
+    "typescript"
+  ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "mongoose": "^8.0.3"
-  },
+  "license": "MIT",
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "concurrently": "^8.2.2"
   }
 }
