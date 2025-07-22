@@ -1,8 +1,13 @@
-import LeaderboardApp from './components/LeaderboardApp';
+import ErrorBoundary from './components/ErrorBoundary';
+import LeaderboardPage from './pages/LeaderboardPage';
 import './App.css';
 
 function App() {
-  return <LeaderboardApp />;
+  return (
+    <ErrorBoundary>
+      <LeaderboardPage />
+    </ErrorBoundary>
+  );
 }
 
 export default App;
