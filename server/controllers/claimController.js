@@ -27,14 +27,15 @@ exports.claimPoints = async (req, res) => {
     // Get updated leaderboard
     const users = await User.find().sort({ totalPoints: -1 });
     const leaderboard = users.map((u, idx) => ({
+      _id: u._id,
       name: u.name,
       avatarUrl: u.avatarUrl,
       totalPoints: u.totalPoints,
       rank: idx + 1
     }));
 
-    // Find new rank for this user
-    const updatedUser = leaderboard.find(u => u.name === user.name && u.avatarUrl === user.avatarUrl && u.totalPoints === user.totalPoints);
+    // Find updated user in leaderboard
+    const updatedUser = leaderboard.find(u => u._id.toString() === userId);
 
     res.json({
       user: updatedUser,
@@ -42,6 +43,7 @@ exports.claimPoints = async (req, res) => {
       leaderboard
     });
   } catch (err) {
+    console.error('Error claiming points:', err);
     res.status(500).json({ error: 'Server error' });
   }
 }; 
